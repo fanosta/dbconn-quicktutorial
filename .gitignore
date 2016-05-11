@@ -4,6 +4,7 @@
 !*.bib
 !.gitignore
 !*.png
+!*.pdf
 !csv/
 !img/
 !tex/
