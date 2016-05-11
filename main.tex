@@ -1,0 +1,123 @@
+\documentclass[11pt, DIV=14]{scrartcl}
+
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{graphicx}
+\usepackage{microtype}
+
+\usepackage{amsmath}
+\usepackage{lmodern}
+
+% syntax highlighting
+\usepackage{minted}
+\usepackage{xcolor, colortbl}
+\definecolor{gray}{rgb}{0.6,0.6,0.6}
+\definecolor{light-gray}{rgb}{0.95,0.95,0.95}
+\newcommand{\listingautorefname}{Codesnippet}
+\renewcommand{\listingscaption}{Codesnippet}
+\renewcommand{\listoflistingscaption}{Codeverzeichnis}
+\setminted{
+	%numbers=left,
+	style=default,
+	tabsize=4,
+	fontsize=\footnotesize,
+	breaklines=true,
+	%breakbytokenanywhere=true,
+	bgcolor=light-gray
+}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xspace}
+
+\let\java\texttt
+\newcommand{\zB}{\mbox{z.\,B.}\xspace}
+
+\title{JDBC-Quicktutorial}
+\date{}
+\author{}
+
+\begin{document}
+
+        \maketitle
+
+
+        \section{Klassen für das Abspeichern der Daten}
+        \label{sec:data}
+
+        Zum Speichern der Daten wird für jede Tabelle in der SQL-Struktur eine eigenen Java-Klasse definiert.
+        Hier wird beispielhaft die Klasse \java{Book} betrachtet.
+
+        \begin{listing}[H]
+            \inputminted[firstline=4, lastline=8, gobble=1]{java}{code/book.java}
+            \caption{Felder der Book-Klasse}
+        \end{listing}
+
+        Für das sinnvolle Verwenden der \java{Book}-Klasse wird noch ein Konstruktor und eine \java{toString()}-Methode benötigt.
+        Diese können mit Hilfe der Menüs \textit{Source} $ \rightarrow $ \textit{Generate Constructor using Fields\ldots} und \textit{Source} $ \rightarrow $ \textit{Generate toString()\ldots} in der Menüleiste generiert werden.
+
+        \begin{listing}[H]
+            \inputminted[firstline=10, lastline=16, gobble=1]{java}{code/book.java}
+            \caption{Konstruktor der Book-Klasse}
+        \end{listing}
+
+        \begin{listing}[H]
+            \inputminted[firstline=18, lastline=21, gobble=1]{java}{code/book.java}
+            \caption{toString() der Book-Klasse}
+        \end{listing}
+
+        \section{DBConn für die Datenbankverbindung}
+        Die Programmlogik, welche für die Kommunikation mit der Datenbank benötigt wird, wird in der Java-Klasse \java{DBConn} programmiert.
+
+		\subsection{Verbindungsaufbau}
+        Im Konstruktor wird eine Verbindung aufgebaut, in den Methoden werden Datenbankabfragen (SELECTs und INSERTs) ausgeführt.
+
+        \begin{listing}[H]
+            \inputminted{java}{code/connect.java}
+            \caption{Verbindungsaufbau zum MySQL-Server im Konstruktor}
+        \end{listing}
+
+		\subsection{Auslesen der Datenbank}
+        Wenn eine Tabelle aus der Datenbank abgefragt wird, wird dafür eine eigene Methode geschrieben. In der Methode passieren folgende Dinge:
+
+        \begin{itemize}
+            \item Anlegen einer Liste in der das Ergebnis gespeichert wird.
+            \item Speichern des SQL-Befehls in einen String
+            \item Ausführen des SQL-Befehls mithilfe von \java{stm.executeQuery(sql)}
+
+            \item Durchgehen des \java{ResultSet}s mithilfe von \java{while (rs.next()) \{\ldots\}}
+            \begin{itemize}
+                \item Erstellen eines neuen Objekts von der zugehörigen Datenklasse (siehe \autoref{sec:data})
+                \item Hinzufügen des eben erstellen Objekts zur Ergebnisliste
+            \end{itemize}
+            \item Returnen der Ergebnisliste
+        \end{itemize}
+
+        \begin{listing}[H]
+            \inputminted{java}{code/select.java}
+            \caption{Abfragen der Tabelle \texttt{books}}
+        \end{listing}
+
+		\subsection{Schreiben in die Datenbank}
+		Zum Schreiben von Dokumenten in die Datenbank werden auch eigene Methoden definert.
+		Hier \zB wird ein Buch in die Datenbank eingefügt.
+
+		\begin{listing}[H]
+            \inputminted[firstline=61, lastline=69, gobble=1]{java}{code/DBConn.java}
+            \caption{Schreiben in die Tabelle \texttt{books}}
+        \end{listing}
+
+
+		\section{JSPs}
+
+		Will man nun \zB eine Liste aus Büchern (\java{List<Book>}) in tabellarischer Form darstellen kann man folgenden Code verwenden.
+		Das Objekt \java{db} wurde hier mit \java{DBConn db = new DBConn();} zu Beginn der JSP erstellt.
+
+		\begin{listing}[H]
+			\inputminted[firstline=37, lastline=51, gobble=4]{jsp}{code/index.jsp}
+			\caption{Erstellen einer HTML-Tabelle}
+		\end{listing}
+
+
+\end{document}
